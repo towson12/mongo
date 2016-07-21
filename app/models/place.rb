@@ -3,14 +3,16 @@ class Place
   attr_accessor :id, :formatted_address, :location, :address_components
 
   def initialize(params)
-  	@id = params[:_id]
+  	@id = params[:_id].to_s
   	@formatted_address = params[:formatted_address]
-  	@location = params[:geometry[:geolocation]
-  	@address_components = params[:address_components]
+  	@location = Point.new(params[:geometry][:geolocation])
+  	@address_components = Array.new
+  	params[:address_components].each do |component|
+  		@address_components.push(AddressComponent.new(component))
+  	end
   end
 
-
-  def mongo_client
+  def mongo_client?
   	Mongoid::Clients.default
   end
 
