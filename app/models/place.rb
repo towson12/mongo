@@ -56,9 +56,26 @@ class Place
     return placesObjects
   end
 
+  def self.get_address_components(sort={}, offset=0, limit=0)
+   #self.collection.find().aggregate([{:$skip=>offset}, {:$limit=>limit},{:$unwind=>'$address_components'}, {:$project=>{:_id=>1,:address_components=>1,:formatted_address=>1,:geometry=>{:geolocation=>1}}}, {:$sort=>sort}])
+
+    stdParams = [ {:$unwind=>'$address_components'},
+                  {:$project=>{:_id=>1,:address_components=>1,:formatted_address=>1,:geometry=>{:geolocation=>1} } } ]
+    
+    optParams = Array.new
+    optParams.push({:$sort=>sort}) if sort.any?
+    optParams.push({:$skip=>offset}) if offset > 0
+    optParams.push({:$limit=>limit}) if limit > 0
+  
+    params = stdParams + optParams
+    self.collection.aggregate(params)
+  end
+
+
   def destroy 
     self.collection.find_one_and_delete(_id: BSON::ObjectId.from_string(@id))
   end
+
 
 
 end
