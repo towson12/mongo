@@ -21,4 +21,10 @@ class Place
   	self.collection.insert_many(hashData)
   end
 
+  def self.find_by_short_name(param)
+  	self.collection.find("address_components.short_name": param)
+  end
+
+
+
 end
