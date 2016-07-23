@@ -47,7 +47,7 @@ class Place
   	end 
   end
 
-  def self.all(offset, limit)
+  def self.all(offset=0, limit=0)
   	searchResults = self.collection.find().skip(offset).limit(limit).to_a
     placesObjects = Array.new
     searchResults.each do |result|
@@ -56,8 +56,8 @@ class Place
     return placesObjects
   end
 
-  def destroy
-    self.collection.delete(BSON::ObjectId.from_string(@id))
+  def destroy 
+    self.collection.find_one_and_delete(_id: BSON::ObjectId.from_string(@id))
   end
 
 
