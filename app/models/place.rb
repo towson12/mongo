@@ -57,8 +57,6 @@ class Place
   end
 
   def self.get_address_components(sort={}, offset=0, limit=0)
-   #self.collection.find().aggregate([{:$skip=>offset}, {:$limit=>limit},{:$unwind=>'$address_components'}, {:$project=>{:_id=>1,:address_components=>1,:formatted_address=>1,:geometry=>{:geolocation=>1}}}, {:$sort=>sort}])
-
     stdParams = [ {:$unwind=>'$address_components'},
                   {:$project=>{:_id=>1,:address_components=>1,:formatted_address=>1,:geometry=>{:geolocation=>1} } } ]
     
@@ -71,6 +69,16 @@ class Place
     self.collection.aggregate(params)
   end
 
+  def self.get_country_names
+      params = [{:$project=>{:address_components=>1}},
+                {:$unwind=>"$address_components"}, 
+                {:$unwind=>"$address_components.types"},
+                {:$match=>{"address_components.types": "country"}},
+                {:$group=>{_id: "$address_components.long_name"}}]
+
+      docs = self.collection.aggregate(params)
+      docs.to_a.map{|h| h[:_id]}
+  end
 
   def destroy 
     self.collection.find_one_and_delete(_id: BSON::ObjectId.from_string(@id))
