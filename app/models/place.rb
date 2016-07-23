@@ -47,5 +47,14 @@ class Place
   	end 
   end
 
+  def self.all(offset, limit)
+  	searchResults = self.collection.find().skip(offset).limit(limit).to_a
+    placesObjects = Array.new
+    searchResults.each do |result|
+      placesObjects.push(Place.new(result))
+    end
+    return placesObjects
+
+  end
 
 end
