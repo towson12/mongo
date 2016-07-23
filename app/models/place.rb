@@ -75,10 +75,22 @@ class Place
                 {:$unwind=>"$address_components.types"},
                 {:$match=>{"address_components.types": "country"}},
                 {:$group=>{_id: "$address_components.long_name"}}]
-
       docs = self.collection.aggregate(params)
       docs.to_a.map{|h| h[:_id]}
   end
+
+  def self.find_ids_by_country_code(code)
+    params = [{:$match=>{"address_components.types": "country"}},
+              {:$match=>{"address_components.short_name": code}},
+              {:$project=>{:_id=>1}}]
+    docs = self.collection.aggregate(params)
+    docs.to_a.map{|h| h[:_id].to_s}
+
+    
+  end
+
+
+
 
   def destroy 
     self.collection.find_one_and_delete(_id: BSON::ObjectId.from_string(@id))
