@@ -12,8 +12,12 @@ class Place
   	end
   end
 
-  def mongo_client?
+  def self.mongo_client?
   	Mongoid::Clients.default
+  end
+
+  def self.collection
+  	mongo_client["places"]
   end
 
   def self.load_all(f)
@@ -25,6 +29,23 @@ class Place
   	self.collection.find("address_components.short_name": param)
   end
 
+  def self.to_places(params)
+  	createdPlaces = Array.new
+  	params.each do |place|
+  		createdPlaces.push(Place.new(place))
+  	end
+  	return createdPlaces
+  end
+
+  def self.find(id)
+  	id = BSON::ObjectId.from_string(id)
+  	doc = self.collection.find(_id: id).first
+  	if doc
+  		Place.new(doc)
+  	else
+  		nil
+  	end 
+  end
 
 
 end
