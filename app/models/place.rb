@@ -54,7 +54,11 @@ class Place
       placesObjects.push(Place.new(result))
     end
     return placesObjects
-
   end
+
+  def destroy
+    self.collection.delete(BSON::ObjectId.from_string(@id))
+  end
+
 
 end
