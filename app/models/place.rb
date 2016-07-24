@@ -84,12 +84,31 @@ class Place
               {:$match=>{"address_components.short_name": code}},
               {:$project=>{:_id=>1}}]
     docs = self.collection.aggregate(params)
-    docs.to_a.map{|h| h[:_id].to_s}
-
-    
+    docs.to_a.map{|h| h[:_id].to_s}    
   end
 
+  def self.create_indexes
+    self.collection.indexes.create_one({"geometry.geolocation": Mongo::Index::GEO2DSPHERE})
+  end
 
+  def self.remove_indexes
+    self.collection.indexes.map do|r|
+      puts r
+      puts "next...."
+    end
+
+
+
+    self.collection.indexes.map do|r|
+      if r[:name] = "geometry.geolocation_2dsphere"
+        self.collection.indexes.drop_one(r[:name])
+        break
+      end
+    end
+
+   
+
+  end
 
 
   def destroy 
