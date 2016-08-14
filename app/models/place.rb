@@ -93,22 +93,36 @@ class Place
 
   def self.remove_indexes
     self.collection.indexes.map do|r|
-      puts r
-      puts "next...."
-    end
-
-
-
-    self.collection.indexes.map do|r|
       if r[:name] = "geometry.geolocation_2dsphere"
         self.collection.indexes.drop_one(r[:name])
         break
       end
     end
-
-   
-
   end
+
+
+
+  #def near(max_meters)
+  #  max_meters=max_meters.nil? ? 1000 : max_meters.to_i
+
+  #  near_points=[]
+
+    def self.near(pt, max_meters=0)
+      self.collection.find(
+      "geometry.geolocation"=>{:$near=>{
+        :$geometry=>pt.to_hash,
+        :$maxDistance=>max_meters}}
+        )#.each do |p|
+      #near_points << Point.new(p) 
+      #end
+    end
+
+   # near_points
+  #end
+  
+
+
+
 
 
   def destroy 
