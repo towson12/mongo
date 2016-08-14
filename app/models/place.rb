@@ -7,8 +7,10 @@ class Place
   	@formatted_address = params[:formatted_address]
   	@location = Point.new(params[:geometry][:geolocation])
   	@address_components = Array.new
-  	params[:address_components].each do |component|
-  		@address_components.push(AddressComponent.new(component))
+    if params[:address_components]
+    	params[:address_components].each do |component|
+    		@address_components.push(AddressComponent.new(component))
+      end
   	end
   end
 
@@ -102,24 +104,20 @@ class Place
 
 
 
-  #def near(max_meters)
-  #  max_meters=max_meters.nil? ? 1000 : max_meters.to_i
-
-  #  near_points=[]
-
-    def self.near(pt, max_meters=0)
-      self.collection.find(
-      "geometry.geolocation"=>{:$near=>{
-        :$geometry=>pt.to_hash,
-        :$maxDistance=>max_meters}}
-        )#.each do |p|
-      #near_points << Point.new(p) 
-      #end
-    end
-
-   # near_points
-  #end
+  def near(max_meters=0)
+    self.class.to_places(self.class.near(@location, max_meters))
+  end
   
+
+  def self.near(pt, max_meters=0)
+     self.collection.find(
+     "geometry.geolocation"=>{:$near=>{
+       :$geometry=>pt.to_hash,
+       :$maxDistance=>max_meters}}
+       )
+  end
+
+   
 
 
 
