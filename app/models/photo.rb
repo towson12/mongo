@@ -7,7 +7,10 @@ class Photo
   	Mongoid::Clients.default
   end
 
-
+  def initialize(params)
+  	@id = params[:_id].to_s
+  	@location = Point.new(params[:metadata][:location]) 
+  end
 
 
 end
